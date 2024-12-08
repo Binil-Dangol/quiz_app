@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import OptionButton from "./OptionButton";
-import { questions, countries } from "../data/Questions";
+import axios from "axios";
 
 // Fisher-Yates Shuffle Algorithm
 const shuffleArray = (array) => {
@@ -22,28 +22,50 @@ const generateOptions = (correctOption, pool) => {
 
 const Quiz = () => {
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [lifelines, setLifelines] = useState(3);
   const [selectedOption, setSelectedOption] = useState(null);
   const [quizStarted, setQuizStarted] = useState(false);
-  const [quizCompleted, setQuizCompleted] = useState(false); // Track quiz completion
+  const [quizCompleted, setQuizCompleted] = useState(false);
   const [quizType, setQuizType] = useState(null); // Tracks the selected quiz type
   const [options, setOptions] = useState([]); // Tracks options for the current question
+  const [loading, setLoading] = useState(false); // Tracks loading state
 
-  // Filter questions based on the selected quiz type
+  // Fetch questions and countries from backend
   useEffect(() => {
     if (quizType) {
-      const filteredQuestions = questions.filter(
-        (question) => question.type === quizType
-      );
-      const shuffled = shuffleArray(filteredQuestions);
-      setShuffledQuestions(shuffled);
+      setLoading(true); // Set loading state to true
+      axios
+        .get("http://localhost:5000/api/questions")
+        .then((res) => {
+          const filteredQuestions = res.data.filter(
+            (question) => question.type === quizType
+          );
+          const shuffled = shuffleArray(filteredQuestions);
+          setShuffledQuestions(shuffled);
 
-      // Generate options for the first question
-      if (shuffled.length > 0) {
-        setOptions(generateOptions(shuffled[0].correctOption, countries));
-      }
+          axios
+            .get("http://localhost:5000/api/countries")
+            .then((countryRes) => {
+              const countryNames = countryRes.data.map((country) => country.name);
+              setCountries(countryNames);
+
+              if (shuffled.length > 0) {
+                setOptions(generateOptions(shuffled[0].correctOption, countryNames));
+              }
+              setLoading(false); // Set loading state to false after data is loaded
+            })
+            .catch((err) => {
+              console.error("Error fetching countries:", err);
+              setLoading(false);
+            });
+        })
+        .catch((err) => {
+          console.error("Error fetching questions:", err);
+          setLoading(false);
+        });
     }
   }, [quizType]);
 
@@ -67,22 +89,22 @@ const Quiz = () => {
 
   const handleOptionClick = (option) => {
     if (!quizStarted || quizCompleted) return;
-  
+
     setSelectedOption(option);
-  
+
     if (option === shuffledQuestions[currentQuestion].correctOption) {
       setScore(score + 1);
     } else {
       const newLifelines = lifelines - 1;
       setLifelines(newLifelines);
-  
+
       // If lifelines reach 0, end the quiz immediately
       if (newLifelines === 0) {
         setQuizCompleted(true);
         return;
       }
     }
-  
+
     // Move to the next question or mark quiz as completed
     setTimeout(() => {
       if (currentQuestion < shuffledQuestions.length - 1) {
@@ -99,7 +121,7 @@ const Quiz = () => {
       }
       setSelectedOption(null);
     }, 500);
-  };  
+  };
 
   if (!quizStarted) {
     // Home screen with quiz type selection
@@ -140,6 +162,10 @@ const Quiz = () => {
     );
   }
 
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
   if (quizCompleted) {
     // Results screen
     return (
@@ -166,7 +192,9 @@ const Quiz = () => {
     );
   }
 
-  if (shuffledQuestions.length === 0) return <h1>Loading...</h1>;
+  if (shuffledQuestions.length === 0) {
+    return <h1>Loading...</h1>;
+  }
 
   const question = shuffledQuestions[currentQuestion];
 
@@ -197,7 +225,6 @@ const Quiz = () => {
         <h3>Score: {score}</h3>
         <h3>Lifelines Remaining: {lifelines}</h3>
       </div>
-      {/* Add a Restart button that is only displayed once the quiz starts */}
       {quizStarted && (
         <button
           style={{
