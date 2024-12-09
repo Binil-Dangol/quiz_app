@@ -156,7 +156,7 @@ const Quiz = () => {
           }}
           onClick={() => startQuiz("map")}
         >
-          Maps
+          Others
         </button>
       </div>
     );
