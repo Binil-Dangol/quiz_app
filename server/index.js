@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const questionRoutes = require("./routes/questionRoutes");
 const countryRoutes = require("./routes/countryRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -23,6 +24,8 @@ mongoose
 // Routes
 app.use("/api/questions", questionRoutes);
 app.use("/api/countries", countryRoutes);
+
+app.use("/api/auth", authRoutes);
 
 // Start Server
 const PORT = 5000;
