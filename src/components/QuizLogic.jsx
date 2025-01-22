@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import OptionButton from "./OptionButton";
 import axios from "axios";
 
@@ -20,6 +20,8 @@ const generateOptions = (correctOption, pool) => {
 };
 
 const QuizLogic = ({ quizType }) => {
+  const location = useLocation();
+  const region = location.state?.region || 'worldwide';
   const navigate = useNavigate();
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
   const [countries, setCountries] = useState([]);
@@ -37,9 +39,16 @@ const QuizLogic = ({ quizType }) => {
     axios
       .get("http://localhost:5000/api/questions")
       .then((res) => {
-        const filteredQuestions = res.data.filter(
+        let filteredQuestions = res.data.filter(
           (question) => question.type === quizType
         );
+
+        // Additional filtering based on region
+        if (region !== 'worldwide') {
+          filteredQuestions = filteredQuestions.filter(
+            (question) => question.region === region
+          );
+        }
         const shuffled = shuffleArray(filteredQuestions);
         setShuffledQuestions(shuffled);
 
@@ -72,7 +81,7 @@ const QuizLogic = ({ quizType }) => {
         console.error("Error fetching questions:", err);
         setLoading(false);
       });
-  }, [quizType]); // Add quizType as a dependency
+  }, [quizType, region]); // Add quizType as a dependency
 
   // Use the memoized fetchQuizData in useEffect
   useEffect(() => {
@@ -110,7 +119,7 @@ const QuizLogic = ({ quizType }) => {
         setQuizCompleted(true);
       }
       setSelectedOption(null);
-    }, 100);
+    }, 500);
   };
 
   const handleRestart = () => {

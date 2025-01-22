@@ -13,9 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB Connection
-// mongodb://localhost:27017
+// mongodb://localhost:27017/quizDB
 // mongodb+srv://Binil:test1234@nodetuts.ehfdi.mongodb.net/quizDB?retryWrites=true&w=majority&appName=nodetuts
-const MONGO_URI = "mongodb://localhost:27017/quizDB"; // MongoDB URI
+const MONGO_URI = "mongodb+srv://Binil:test1234@nodetuts.ehfdi.mongodb.net/quizDB?retryWrites=true&w=majority&appName=nodetuts"; // MongoDB URI
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))

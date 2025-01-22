@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserButton from "./UserButton";
 
@@ -11,6 +12,10 @@ const Quiz = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setAuthenticated(false);
+  };
+
+  const handleQuizTypeSelect = (quizType) => {
+    navigate('/quiz-subcategory', { state: { quizType } });
   };
 
   if (!authenticated) {
@@ -32,7 +37,7 @@ const Quiz = () => {
           borderRadius: "5px",
           marginRight: "10px",
         }}
-        onClick={() => navigate("/flags-quiz")}
+        onClick={() => handleQuizTypeSelect('flag')}
       >
         Flags
       </button>
@@ -46,7 +51,7 @@ const Quiz = () => {
           border: "none",
           borderRadius: "5px",
         }}
-        onClick={() => navigate("/maps-quiz")}
+        onClick={() => handleQuizTypeSelect('map')}
       >
         Maps
       </button>

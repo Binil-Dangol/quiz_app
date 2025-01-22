@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import OptionButton from "./OptionButton";
-import axios from "axios";
+import React from "react";
 import QuizLogic from "./QuizLogic";
 
 const FlagsQuiz = () => {

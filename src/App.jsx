@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Quiz from "./components/Quiz";
+import QuizSubcategory from "./components/QuizSubcategory";
 import FlagsQuiz from "./components/FlagsQuiz";
 import MapsQuiz from "./components/MapsQuiz";
 
@@ -17,6 +18,7 @@ const App = () => {
       <Route path="/" element={<Login onLoginSuccess={handleLoginSuccess} />} />
       <Route path="/register" element={<Register />} />
       <Route path="/quiz" element={<Quiz />} />
+      <Route path="/quiz-subcategory" element={<QuizSubcategory />} />
       <Route path="/flags-quiz" element={<FlagsQuiz />} />
       <Route path="/maps-quiz" element={<MapsQuiz />} />
     </Routes>
