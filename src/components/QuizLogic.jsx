@@ -36,57 +36,58 @@ const QuizLogic = ({ quizType }) => {
   // Use useCallback to memoize the fetchQuizData function
   const fetchQuizData = useCallback(() => {
     setLoading(true);
-    axios
-      .get("http://localhost:5000/api/questions")
-      .then((res) => {
-        let filteredQuestions = res.data.filter(
-          (question) => question.type === quizType
+     // Fetch questions and countries simultaneously
+     Promise.all([
+      axios.get("http://localhost:5000/api/questions"),
+      axios.get("http://localhost:5000/api/countries")
+    ])
+    .then(([questionsRes, countriesRes]) => {
+      // Filter questions by quiz type and region
+      let filteredQuestions = questionsRes.data.filter(
+        (question) => question.type === quizType && 
+        (region === 'worldwide' || question.region === region)
+      );
+
+      // Filter countries by region
+      let filteredCountries = countriesRes.data;
+      if (region !== 'worldwide') {
+        filteredCountries = filteredCountries.filter(
+          (country) => country.region === region
         );
+      }
 
-        // Additional filtering based on region
-        if (region !== 'worldwide') {
-          filteredQuestions = filteredQuestions.filter(
-            (question) => question.region === region
-          );
-        }
-        const shuffled = shuffleArray(filteredQuestions);
-        setShuffledQuestions(shuffled);
+      const countryNames = filteredCountries.map((country) => country.name);
+      
+      // Shuffle and set questions
+      const shuffled = shuffleArray(filteredQuestions);
+      setShuffledQuestions(shuffled);
+      setCountries(countryNames);
 
-        axios
-          .get("http://localhost:5000/api/countries")
-          .then((countryRes) => {
-            const countryNames = countryRes.data.map((country) => country.name);
-            setCountries(countryNames);
+      // Set initial options if questions exist
+      if (shuffled.length > 0) {
+        setOptions(
+          generateOptions(shuffled[0].correctOption, countryNames)
+        );
+      }
 
-            if (shuffled.length > 0) {
-              setOptions(
-                generateOptions(shuffled[0].correctOption, countryNames)
-              );
-            }
-            setLoading(false);
-            
-            // Reset quiz state
-            setCurrentQuestion(0);
-            setScore(0);
-            setLifelines(3);
-            setSelectedOption(null);
-            setQuizCompleted(false);
-          })
-          .catch((err) => {
-            console.error("Error fetching countries:", err);
-            setLoading(false);
-          });
-      })
-      .catch((err) => {
-        console.error("Error fetching questions:", err);
-        setLoading(false);
-      });
-  }, [quizType, region]); // Add quizType as a dependency
+      // Reset quiz state
+      setCurrentQuestion(0);
+      setScore(0);
+      setLifelines(3);
+      setSelectedOption(null);
+      setQuizCompleted(false);
 
-  // Use the memoized fetchQuizData in useEffect
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching data:", err);
+      setLoading(false);
+    });
+  }, [quizType, region]);
+
   useEffect(() => {
     fetchQuizData();
-  }, [fetchQuizData]); // Now includes fetchQuizData as a dependency
+  }, [fetchQuizData]);
 
   const handleOptionClick = (option) => {
     if (quizCompleted) return;
@@ -119,7 +120,7 @@ const QuizLogic = ({ quizType }) => {
         setQuizCompleted(true);
       }
       setSelectedOption(null);
-    }, 500);
+    }, 100);
   };
 
   const handleRestart = () => {
