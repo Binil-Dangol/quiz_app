@@ -36,8 +36,8 @@ const QuizLogic = ({ quizType }) => {
   // Use useCallback to memoize the fetchQuizData function
   const fetchQuizData = useCallback(() => {
     setLoading(true);
-     // Fetch questions and countries simultaneously
-     Promise.all([
+    // Fetch questions and countries simultaneously
+    Promise.all([
       axios.get("http://localhost:5000/api/questions"),
       axios.get("http://localhost:5000/api/countries")
     ])
@@ -129,12 +129,16 @@ const QuizLogic = ({ quizType }) => {
 
   if (loading) return <h1>Loading...</h1>;
 
+  const renderLifelines = () => {
+    return "❤️".repeat(lifelines);
+  };
+
   if (quizCompleted)
     return (
       <div style={{ textAlign: "center", padding: "20px" }}>
         <h1>Quiz Completed!</h1>
         <h3>Your Score: {score}</h3>
-        <h3>Remaining Lifelines: {lifelines}</h3>
+        {lifelines > 0 && <h3>Remaining Lifelines: {renderLifelines()}</h3>}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
@@ -202,7 +206,7 @@ const QuizLogic = ({ quizType }) => {
       </div>
       <div style={{ marginTop: "20px" }}>
         <h3>Score: {score}</h3>
-        <h3>Lifelines Remaining: {lifelines}</h3>
+        {lifelines > 0 && <h3>Remaining Lifelines: {renderLifelines()}</h3>}
         <button
           onClick={() => navigate("/quiz")}
           style={{
