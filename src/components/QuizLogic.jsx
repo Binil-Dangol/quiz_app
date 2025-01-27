@@ -33,6 +33,45 @@ const QuizLogic = ({ quizType }) => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // New method to update score on backend
+  const updateScoreOnBackend = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Map region to backend subcategory format
+      const subcategoryMap = {
+        'worldwide': 'Worldwide',
+        'africa': 'Africa',
+        'asia': 'Asia',
+        'australia': 'Australia and Oceania',
+        'europe': 'Europe',
+        'north-america': 'North America',
+        'south-america': 'South America'
+      };
+
+      const subcategory = subcategoryMap[region] || 'Worldwide';
+      
+      // Determine category based on quizType
+      const category = quizType === 'flag' ? 'flags' : 'maps';
+
+      await axios.post(
+        'http://localhost:5000/api/scores/update-score', 
+        { 
+          category, 
+          subcategory, 
+          score 
+        },
+        {
+          headers: { 
+            'Authorization': `Bearer ${token}` 
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Failed to update score:', error);
+    }
+  };
+
   // Use useCallback to memoize the fetchQuizData function
   const fetchQuizData = useCallback(() => {
     setLoading(true);
@@ -101,6 +140,8 @@ const QuizLogic = ({ quizType }) => {
       setLifelines(newLifelines);
 
       if (newLifelines === 0) {
+        // Update score on backend when lifelines are depleted
+        updateScoreOnBackend();
         setQuizCompleted(true);
         return;
       }
@@ -118,11 +159,13 @@ const QuizLogic = ({ quizType }) => {
         );
       } else {
         setQuizCompleted(true);
+        // Update score on backend when quiz is completed normally
+        updateScoreOnBackend();
       }
       setSelectedOption(null);
     }, 100);
   };
-
+  
   const handleRestart = () => {
     fetchQuizData();
   };
