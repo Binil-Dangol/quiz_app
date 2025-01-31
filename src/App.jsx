@@ -6,6 +6,7 @@ import Quiz from "./components/Quiz";
 import QuizSubcategory from "./components/QuizSubcategory";
 import FlagsQuiz from "./components/FlagsQuiz";
 import MapsQuiz from "./components/MapsQuiz";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
   const handleLoginSuccess = (token, user) => {
@@ -17,10 +18,10 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Login onLoginSuccess={handleLoginSuccess} />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/quiz" element={<Quiz />} />
-      <Route path="/quiz-subcategory" element={<QuizSubcategory />} />
-      <Route path="/flags-quiz" element={<FlagsQuiz />} />
-      <Route path="/maps-quiz" element={<MapsQuiz />} />
+      <Route path="/quiz" element={<PrivateRoute element={Quiz} />} />
+      <Route path="/quiz-subcategory" element={<PrivateRoute element={QuizSubcategory} />} />
+      <Route path="/flags-quiz" element={<PrivateRoute element={FlagsQuiz} />} />
+      <Route path="/maps-quiz" element={<PrivateRoute element={MapsQuiz} />} />
     </Routes>
   );
 };
