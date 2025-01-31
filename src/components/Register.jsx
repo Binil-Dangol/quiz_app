@@ -6,12 +6,19 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     try {
       await axios.post("http://localhost:5000/api/auth/register", { name, email, password });
       setSuccess(true);
@@ -26,7 +33,14 @@ const Register = () => {
       <h1>Register</h1>
       {success ? (
         <p>
-          Registration successful! You can now <button onClick={() => navigate("/")} style={{ color: "blue", background: "none", border: "none", cursor: "pointer" }}>log in</button>.
+          Registration successful! You can now{" "}
+          <button
+            onClick={() => navigate("/")}
+            style={{ color: "blue", background: "none", border: "none", cursor: "pointer" }}
+          >
+            log in
+          </button>
+          .
         </p>
       ) : null}
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -55,10 +69,24 @@ const Register = () => {
           required
           style={{ display: "block", margin: "10px auto" }}
         />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          style={{ display: "block", margin: "10px auto" }}
+        />
         <button type="submit" style={{ padding: "10px 20px" }}>Register</button>
       </form>
       <p>
-        Already have an account? <button onClick={() => navigate("/")} style={{ color: "blue", background: "none", border: "none", cursor: "pointer" }}>Log in</button>
+        Already have an account?{" "}
+        <button
+          onClick={() => navigate("/")}
+          style={{ color: "blue", background: "none", border: "none", cursor: "pointer" }}
+        >
+          Log in
+        </button>
       </p>
     </div>
   );
