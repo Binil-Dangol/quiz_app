@@ -14,83 +14,66 @@ const UserButton = ({ user, onLogout }) => {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to permanently delete your account? This action cannot be undone."
+      )
+    ) {
       try {
         // Get the token from localStorage
-        const token = localStorage.getItem('token');
-        
+        const token = localStorage.getItem("token");
+
         // Make sure to include the token in the request headers
         await axios.delete("http://localhost:5000/api/auth/delete-account", {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-        
+
         onLogout();
         navigate("/");
       } catch (error) {
-        console.error("Error deleting account:", error.response ? error.response.data : error);
+        console.error(
+          "Error deleting account:",
+          error.response ? error.response.data : error
+        );
         alert("Failed to delete account. Please try again.");
       }
     }
   };
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }}>
+    <div style={styles.container}>
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          marginTop: "10px",
-        }}
+        style={styles.userButton}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#138496")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#17a2b8")}
       >
         {user.name}
+        <span style={styles.arrow}>{showDropdown ? "▲" : "▼"}</span>
       </button>
       {showDropdown && (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            backgroundColor: "white",
-            border: "1px solid #ddd",
-            borderRadius: "5px",
-            padding: "10px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-            zIndex: 10,
-          }}
-        >
+        <div style={styles.dropdown}>
           <button
             onClick={handleLogout}
             style={{
-              display: "block",
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#f44336",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              marginBottom: "10px",
+              ...styles.dropdownButton,
+              whiteSpace: "nowrap",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#138496")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#17a2b8")}
           >
             Logout
           </button>
           <button
             onClick={handleDeleteAccount}
             style={{
-              display: "block",
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#ff9800",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
+              ...styles.deleteButton,
+              whiteSpace: "nowrap",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c82333")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc3545")}
           >
             Delete Account
           </button>
@@ -98,6 +81,77 @@ const UserButton = ({ user, onLogout }) => {
       )}
     </div>
   );
+};
+
+// Internal CSS styles
+const styles = {
+  container: {
+    position: "relative",
+    display: "inline-block",
+    marginTop: "20px",
+  },
+  userButton: {
+    padding: "10px 15px",
+    fontSize: "1em",
+    cursor: "pointer",
+    backgroundColor: "#17a2b8", // Bootstrap Info Blue
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    display: "flex",
+    alignItems: "center",
+    transition: "background-color 0.2s",
+  },
+  arrow: {
+    marginLeft: "10px",
+    fontSize: "0.8em",
+  },
+  dropdown: {
+    position: "absolute",
+    right: 0,
+    backgroundColor: "white",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    padding: "10px",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+    zIndex: 10,
+    marginTop: "5px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  dropdownButton: {
+    padding: "10px 20px",
+    backgroundColor: "#17a2b8",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "1em",
+    fontFamily: "inherit",
+    cursor: "pointer",
+    marginBottom: "5px",
+    transition: "background-color 0.2s",
+    // Add the following properties
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButton: {
+    padding: "10px 20px",
+    backgroundColor: "#dc3545", // Bootstrap Danger Red
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "1em",
+    fontFamily: "inherit",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    // Add the following properties
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 };
 
 export default UserButton;

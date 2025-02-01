@@ -10,7 +10,7 @@ const defaultScores = {
     'Europe': 0,
     'North America': 0,
     'South America': 0,
-    'Worldwide': 0
+    'Worldwide': 0,
   },
   maps: {
     'Africa': 0,
@@ -19,8 +19,8 @@ const defaultScores = {
     'Europe': 0,
     'North America': 0,
     'South America': 0,
-    'Worldwide': 0
-  }
+    'Worldwide': 0,
+  },
 };
 
 const ScoreDisplay = () => {
@@ -32,18 +32,18 @@ const ScoreDisplay = () => {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:5000/api/scores/scores', {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         // Create a new scores object starting with default values
         const organizedScores = {
           flags: { ...defaultScores.flags },
-          maps: { ...defaultScores.maps }
+          maps: { ...defaultScores.maps },
         };
 
         // Update only the scores that exist in the response
-        response.data.scores.forEach(score => {
+        response.data.scores.forEach((score) => {
           if (organizedScores[score.category]) {
             organizedScores[score.category][score.subcategory] = score.highestScore;
           }
@@ -61,72 +61,80 @@ const ScoreDisplay = () => {
   }, []);
 
   return (
-    <div className="score-display" style={{
-      padding: '20px',
-      backgroundColor: '#f5f5f5',
-      borderRadius: '8px',
-      height: '100%',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-    }}>
-      <h2 style={{ 
-        textAlign: 'center', 
-        marginBottom: '20px',
-        color: '#333',
-        fontSize: '1.5rem',
-        fontWeight: 'bold'
-      }}>Your Highest Scores</h2>
-      
+    <div style={styles.container}>
+      <h2 style={styles.title}>Your Highest Scores</h2>
+
       {/* Flags Section */}
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ 
-          color: '#4CAF50', 
-          borderBottom: '2px solid #4CAF50',
-          paddingBottom: '5px',
-          marginBottom: '10px',
-          fontSize: '1.2rem'
-        }}>Flags</h3>
+      <div style={styles.categorySection}>
+        <h3 style={{ ...styles.categoryTitle, borderColor: '#28a745' }}>Flags</h3>
         {Object.entries(scores.flags).map(([region, score]) => (
-          <div key={`flags-${region}`} style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '8px 0',
-            borderBottom: '1px solid #ddd'
-          }}>
-            <span>{region}:</span>
-            <span style={{ 
-              fontWeight: 'bold',
-              color: score > 0 ? '#4CAF50' : '#666'
-            }}>{score}</span>
+          <div key={`flags-${region}`} style={styles.scoreRow}>
+            <span style={styles.regionText}>{region}</span>
+            <span style={{ ...styles.scoreText, color: score > 0 ? '#28a745' : '#6c757d' }}>
+              {score}
+            </span>
           </div>
         ))}
       </div>
 
       {/* Maps Section */}
-      <div>
-        <h3 style={{ 
-          color: '#008CBA', 
-          borderBottom: '2px solid #008CBA',
-          paddingBottom: '5px',
-          marginBottom: '10px',
-          fontSize: '1.2rem'
-        }}>Maps</h3>
+      <div style={styles.categorySection}>
+        <h3 style={{ ...styles.categoryTitle, borderColor: '#17a2b8' }}>Maps</h3>
         {Object.entries(scores.maps).map(([region, score]) => (
-          <div key={`maps-${region}`} style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '8px 0',
-            borderBottom: '1px solid #ddd'
-          }}>
-            <span>{region}:</span>
-            <span style={{ 
-              fontWeight: 'bold',
-              color: score > 0 ? '#008CBA' : '#666'
-            }}>{score}</span>
+          <div key={`maps-${region}`} style={styles.scoreRow}>
+            <span style={styles.regionText}>{region}</span>
+            <span style={{ ...styles.scoreText, color: score > 0 ? '#17a2b8' : '#6c757d' }}>
+              {score}
+            </span>
           </div>
         ))}
       </div>
     </div>
   );
+};
+
+// Internal CSS styles
+const styles = {
+  container: {
+    padding: '20px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    height: '100%',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    overflowY: 'auto',
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: '20px',
+    color: '#2c7873', // Deep Teal
+    fontSize: '1.8rem',
+    fontWeight: 'bold',
+  },
+  categorySection: {
+    marginBottom: '30px',
+  },
+  categoryTitle: {
+    color: '#2c7873',
+    borderBottom: '2px solid',
+    paddingBottom: '5px',
+    marginBottom: '15px',
+    fontSize: '1.4rem',
+  },
+  scoreRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '8px 0',
+    borderBottom: '1px solid #ddd',
+  },
+  regionText: {
+    color: '#2c7873',
+    fontSize: '1em',
+  },
+  scoreText: {
+    fontWeight: 'bold',
+    fontSize: '1em',
+  },
 };
 
 export default ScoreDisplay;

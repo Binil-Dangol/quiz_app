@@ -21,6 +21,94 @@ const generateOptions = (correctOption, pool) => {
 };
 
 const QuizLogic = ({ quizType }) => {
+
+
+  const styles = {
+    container: {
+      display: "grid",
+      gridTemplateColumns: "3fr 1fr",
+      gap: "20px",
+      padding: "20px",
+      backgroundColor: "#eaf6f6", // Light Teal
+      minHeight: "100vh",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    },
+    quizArea: {
+      textAlign: "center",
+      padding: "20px",
+      backgroundColor: "#fff",
+      borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+    },
+    title: {
+      fontSize: "2em",
+      color: "#2c7873", // Deep Teal
+      marginBottom: "20px",
+    },
+    image: {
+      width: "100%",
+      maxWidth: "400px",
+      height: "auto",
+      borderRadius: "8px",
+      marginBottom: "20px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      border: "1px solid #ccc",                   
+      backgroundColor: "#fff",                  
+    },
+    optionsContainer: {
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      gap: "15px",
+      marginBottom: "20px",
+    },
+    scoreSection: {
+      marginTop: "20px",
+    },
+    scoreText: {
+      fontSize: "1.2em",
+      color: "#2c7873",
+    },
+    lifelinesText: {
+      fontSize: "1.2em",
+      color: "#dc3545", 
+    },
+    button: {
+      padding: "12px 30px",
+      fontSize: "1em",
+      cursor: "pointer",
+      backgroundColor: "#17a2b8", 
+      color: "white",
+      border: "none",
+      borderRadius: "4px",
+      marginTop: "10px",
+      fontFamily: "inherit",
+      transition: "background-color 0.2s",
+    },
+    buttonHover: {
+      backgroundColor: "#138496",
+    },
+    quizCompletedTitle: {
+      fontSize: "2.5em",
+      color: "#2c7873",
+      marginBottom: "20px",
+    },
+    quizCompletedScore: {
+      fontSize: "1.5em",
+      color: "#2c7873",
+    },
+    buttonContainer: {
+      display: "flex",
+      justifyContent: "center",
+      gap: "20px",
+      marginTop: "30px",
+      flexWrap: "wrap",
+    },
+  };
+
   const location = useLocation();
   const region = location.state?.region || "worldwide";
   const navigate = useNavigate();
@@ -170,7 +258,7 @@ const QuizLogic = ({ quizType }) => {
     fetchQuizData();
   };
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return <h1 style={styles.title}>Loading...</h1>;
 
   const renderLifelines = () => {
     return "❤️".repeat(lifelines);
@@ -178,51 +266,29 @@ const QuizLogic = ({ quizType }) => {
 
   if (quizCompleted)
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "3fr 1fr",
-          gap: "20px",
-          padding: "20px",
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <h1>Quiz Completed!</h1>
-          <h3>Your Score: {score}</h3>
-          {lifelines > 0 && <h3>Remaining Lifelines: {renderLifelines()}</h3>}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "20px",
-              marginTop: "20px",
-            }}
-          >
+      <div style={styles.container}>
+        <div style={styles.quizArea}>
+          <h1 style={styles.quizCompletedTitle}>Quiz Completed!</h1>
+          <h3 style={styles.quizCompletedScore}>Your Score: {score}</h3>
+          {lifelines > 0 && (
+            <h3 style={styles.lifelinesText}>
+              Remaining Lifelines: {renderLifelines()}
+            </h3>
+          )}
+          <div style={styles.buttonContainer}>
             <button
               onClick={handleRestart}
-              style={{
-                padding: "10px 20px",
-                fontSize: "16px",
-                cursor: "pointer",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-              }}
+              style={styles.button}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#138496")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#17a2b8")}
             >
               Restart Quiz
             </button>
             <button
               onClick={() => navigate("/quiz")}
-              style={{
-                padding: "10px 20px",
-                fontSize: "16px",
-                cursor: "pointer",
-                backgroundColor: "#008CBA",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-              }}
+              style={styles.button}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#138496")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#17a2b8")}
             >
               Back to Quiz Selection
             </button>
@@ -232,64 +298,51 @@ const QuizLogic = ({ quizType }) => {
       </div>
     );
 
-  if (shuffledQuestions.length === 0) return <h1>Loading...</h1>;
-
-  const question = shuffledQuestions[currentQuestion];
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "3fr 1fr",
-        gap: "20px",
-        padding: "20px",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <h2>
-          {question.type === "flag"
-            ? "Which country's flag is this?"
-            : "Which country is shown on the map?"}
-        </h2>
-        <img
-          src={question.imageUrl}
-          alt="Quiz Visual"
-          style={{ width: "300px", height: "200px" }}
-        />
-        <div>
-          {options.map((option, index) => (
-            <OptionButton
-              key={index}
-              text={option}
-              selected={selectedOption === option}
-              correct={option === question.correctOption}
-              onClick={() => handleOptionClick(option)}
-            />
-          ))}
+    if (shuffledQuestions.length === 0)
+      return <h1 style={styles.title}>No Questions Available</h1>;
+  
+    const question = shuffledQuestions[currentQuestion];
+  
+    return (
+      <div style={styles.container}>
+        <div style={styles.quizArea}>
+          <h2 style={styles.title}>
+            {question.type === "flag"
+              ? "Which country's flag is this?"
+              : "Which country is shown on the map?"}
+          </h2>
+          <img src={question.imageUrl} alt="Quiz Visual" style={styles.image} />
+          <div style={styles.optionsContainer}>
+            {options.map((option, index) => (
+              <OptionButton
+                key={index}
+                text={option}
+                selected={selectedOption === option}
+                correct={option === question.correctOption}
+                onClick={() => handleOptionClick(option)}
+              />
+            ))}
+          </div>
+          <div style={styles.scoreSection}>
+            <h3 style={styles.scoreText}>Score: {score}</h3>
+            {lifelines > 0 && (
+              <h3 style={styles.lifelinesText}>
+                Remaining Lifelines: {renderLifelines()}
+              </h3>
+            )}
+            <button
+              onClick={() => navigate("/quiz")}
+              style={styles.button}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#138496")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#17a2b8")}
+            >
+              Back to Quiz Selection
+            </button>
+          </div>
         </div>
-        <div style={{ marginTop: "20px" }}>
-          <h3>Score: {score}</h3>
-          {lifelines > 0 && <h3>Remaining Lifelines: {renderLifelines()}</h3>}
-          <button
-            onClick={() => navigate("/quiz")}
-            style={{
-              padding: "10px 20px",
-              fontSize: "16px",
-              cursor: "pointer",
-              backgroundColor: "#008CBA",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              marginTop: "10px",
-            }}
-          >
-            Back to Quiz Selection
-          </button>
-        </div>
+        <ScoreDisplay />
       </div>
-      <ScoreDisplay />
-    </div>
-  );
-};
+    );
+  };
 
 export default QuizLogic;
