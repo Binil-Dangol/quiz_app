@@ -56,8 +56,8 @@ QuizApp is an interactive MERN stack web application that allows users to test t
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/quiz-app.git
-   cd quiz-app
+   git clone https://github.com/Binil-Dangol/quiz_app.git
+   cd quiz_app
    ```
 
 2. **Install server dependencies**
